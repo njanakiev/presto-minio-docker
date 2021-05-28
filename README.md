@@ -54,7 +54,7 @@ s3cmd --config minio.s3cfg la
 
 ## Access Presto with CLI and Prepare Table
 
-Download presto cli with:
+Download [presto cli](https://prestodb.io/docs/current/installation/cli.html) with:
 
 ```bash
 wget https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.253/presto-cli-0.253-executable.jar \
@@ -89,3 +89,33 @@ Query the newly created table with:
 SHOW TABLES IN minio.iris;
 SELECT * FROM minio.iris.iris_parquet LIMIT 5;"
 ```
+
+## Importing data from other Connectors
+
+Create new table in PostgreSQL from [TPCDS](https://prestodb.io/docs/current/connector/tpcds.html):
+
+```bash
+./presto --execute "
+CREATE TABLE postgresql.public.item AS 
+  SELECT i_item_id, i_item_desc 
+  FROM tpcds.tiny.item;"
+```
+
+Create new table in Minio from TPCDS:
+
+```bash
+# Create new bucket
+s3cmd --config minio.s3cfg mb s3://data
+
+./presto --execute "
+CREATE SCHEMA IF NOT EXISTS minio.data 
+WITH (location = 's3a://data/');
+
+CREATE TABLE minio.data.item 
+WITH (format = 'PARQUET') AS 
+  SELECT i_item_id, i_item_desc 
+  FROM tpcds.tiny.item;
+```
+
+# License 
+This project is licensed under the MIT license. See the [LICENSE](LICENSE) for details.
