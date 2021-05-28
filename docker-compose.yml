@@ -52,6 +52,17 @@ services:
     networks:
       - presto-network
 
+  postgres:
+    hostname: postgres
+    image: 'postgres:11.12-alpine'
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - presto-network
+
 volumes:
   minio-data:
     driver: local
