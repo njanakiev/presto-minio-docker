@@ -90,6 +90,43 @@ SHOW TABLES IN minio.iris;
 SELECT * FROM minio.iris.iris_parquet LIMIT 5;"
 ```
 
+
+## Create Table from CSV
+
+Survived,Pclass,Name,Sex,Age,Siblings/Spouses Aboard,Parents/Children Aboard,Fare
+0,3,Mr. Owen Harris Braund,male,22,1,0,7.25
+
+```bash
+./presto --execute "
+CREATE TABLE hive.testbucket.titanic (
+    Survived INTEGER,
+    Pclass INTEGER,
+    Name VARCHAR,
+    Sex VARCHAR,
+    Age INTEGER,
+    SiblingsSpouses INTEGER,
+    ParentsChildren INTEGER,
+    Fare DOUBLE)
+WITH (FORMAT = 'CSV',
+    csv_separator = ',',
+    external_location = 's3a://testbucket/titanic');"
+
+./presto --execute "
+CREATE TABLE hive.testbucket.titanic (
+    Survived int,
+    Pclass int,
+    Name varchar,
+    Sex varchar,
+    Age int,
+    SiblingsSpouses int,
+    ParentsChildren int,
+    Fare double)
+WITH (FORMAT = 'TEXTFILE',
+    csv_separator = ',',
+    external_location = 's3a://testbucket/titanic');"
+```
+
+
 ## Importing data from other Connectors
 
 Create new table in PostgreSQL from [TPCDS](https://prestodb.io/docs/current/connector/tpcds.html):
